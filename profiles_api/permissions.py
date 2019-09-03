@@ -9,4 +9,16 @@ class UpdateOwnProfile(permissions.BasePermission):
         if request.method is permissions.SAFE_METHODS:
             return True
 
-        return obj.id == request.user.id 
+        return obj.id == request.user.id
+
+
+class UpdateOwnStatus(permissions.BasePermission):
+    """Update own user feed"""
+
+    def has_object_permission(self,request,view,obj):
+
+        if request.method is permissions.SAFE_METHODS:
+            return True
+
+        return obj.UserProfile
+        

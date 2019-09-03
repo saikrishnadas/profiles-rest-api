@@ -6,6 +6,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework import filters
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
+from rest_framework.permissions import ISAUTHENTICATED
 
 from profiles_api import serializers
 from profiles_api import permissions
@@ -68,7 +69,7 @@ class HelloViewSet(viewsets.ViewSet):
             'needs only less code',
         ]
 
-        return Response({'message':'Hello','a_viewset',a_viewset})
+        return Response({'message':'Hello','a_viewset':a_viewset})
 
     def create(self,request):
         """Returns Hello user"""
@@ -109,3 +110,22 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     permissions_classes = (permissions.UpdateOwnProfile,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name','email',)
+
+class UserLoginApiView(ObtainAuthToken):
+    """Create token for user login"""
+    renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+
+
+class ProfileFeedItemViewSet(viewsets.ModelViewSet):
+    """Handles create and updating user feeds """
+    serializer_class = serializers.ProfileFeedItemSerializer
+    queryset = models.ProfileFeedItem.objects.all()
+    authentication_classes = (TokenAuthentication,)
+    permissions_classes = (
+        permissions.UpdateOwnStatus,
+        ISAUTHENTICATED,
+    )
+
+    def perform_create(self,serializer):
+        """Sets the user profile to logged in user"""
+        serializer.save(user_profile=self.request.user)

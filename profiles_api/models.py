@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
+from django.conf import settings
 
 
 class UserProfileManager(BaseUserManager):
@@ -77,3 +78,17 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         """What to show when we output an object as a string."""
 
         return self.email
+
+
+class ProfileFeedItem(models.Model):
+    """Profile feeds"""
+    user_profile = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete = models.CASCADE
+    )
+    status_text = models.CharField(max_length = 255)
+    created_on = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        """Return model as string"""
+        return self.status_text

@@ -9,16 +9,14 @@ class HelloSerializer(serializers.Serializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    """Create serializers for user profile"""
+    """A serializer for our profile object."""
 
     class Meta:
         model = models.UserProfile
-        fields = ('id','email','name','password')
-        extra_kwargs={
-            'password':{
-                'write_only' = True,
-                'style' = {'input':'password'}
-            }
+        fields = ('id', 'email', 'name', 'last_login', 'password')
+        extra_kwargs = {
+            'last_login': {'read_only': True},
+            'password': {'write_only': True}
         }
 
     def create(self,validated_data):
@@ -29,3 +27,12 @@ class UserProfileSerializer(serializers.ModelSerializer):
             password = validated_data['password'],
         )
         return user
+
+
+class ProfileFeedItemSerializer(serializers.ModelSerializer):
+    """A serializer for our profile feed object."""
+
+    class Meta:
+        model = models.ProfileFeedItem
+        fields = ('id', 'user_profile', 'status_text', 'created_on')
+        extra_kwargs = {'user_profile': {'read_only': True}}
